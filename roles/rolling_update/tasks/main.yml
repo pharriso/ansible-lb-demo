@@ -9,7 +9,7 @@
     backend: http
   delegate_to: lb.demolab.local
 
-- name: Update all packages
+- name: Patch Server
   yum:
     name: "{{ item }}"
     state: latest
