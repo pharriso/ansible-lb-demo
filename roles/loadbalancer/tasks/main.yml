@@ -1,0 +1,36 @@
+---
+
+- name: Install socat
+  yum:
+    name: socat
+    state: installed
+
+- name: Disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: false
+
+- name: Install haproxy 
+  yum: 
+    name: haproxy 
+    state: present
+
+- name: Start haproxy service
+  service: 
+    name: haproxy 
+    state: started 
+    enabled: yes
+
+- name: Configure haproxy content
+  template: 
+    dest: /etc/haproxy/haproxy.cfg 
+    src: haproxy.cfg.j2
+  notify:
+    - restart haproxy
+
+- name: Copy across haproxy check script
+  copy:
+    src: check_loadbalancer.sh
+    dest: /root/
+    mode: 0755
