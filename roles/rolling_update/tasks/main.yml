@@ -8,7 +8,6 @@
     host: "{{ inventory_hostname }}"
     backend: http
   delegate_to: lb.demolab.local
-  when: patches | changed
 
 - name: Update all packages
   yum:
