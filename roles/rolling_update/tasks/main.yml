@@ -1,0 +1,46 @@
+---
+
+
+- name: Remove server from loadbalancer pool
+  haproxy:
+    state: disabled
+    socket: /var/lib/haproxy/stats
+    host: "{{ inventory_hostname }}"
+    backend: http
+  delegate_to: lb.demolab.local
+  when: patches | changed
+
+- name: Update all packages
+  yum:
+    name: kernel
+    state: latest
+  register: patches
+
+- name: Reboot server
+  shell: sleep 2 && reboot
+  async: 1
+  poll: 0
+  ignore_errors: true
+  when: patches | changed
+
+- name: Wait for server to come back
+  wait_for: 
+    host: "{{ inventory_hostname }}"
+    delay: 10 
+    timeout: 300 
+    port: 22
+  delegate_to: localhost
+  when: patches | changed
+
+- name: Add server back into loadbalancer pool
+  haproxy:
+    state: enabled
+    socket: /var/lib/haproxy/stats
+    host: "{{ inventory_hostname }}"
+    backend: http
+  delegate_to: lb.demolab.local
+  when: patches | changed
+
+- name: Pause for 15 seconds
+  pause:
+    seconds: 15
