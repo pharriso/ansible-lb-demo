@@ -5,12 +5,6 @@
     name: socat
     state: installed
 
-- name: Disable firewalld
-  service:
-    name: firewalld
-    state: stopped
-    enabled: false
-
 - name: Install haproxy 
   yum: 
     name: haproxy 
