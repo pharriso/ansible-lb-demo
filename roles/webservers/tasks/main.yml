@@ -14,6 +14,6 @@
 - name: Configure Web Content
   template: 
     dest: /var/www/html/index.html 
-    src: index.html
+    src: index.html.j2
   notify:
     - restart httpd
