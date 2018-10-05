@@ -43,6 +43,10 @@
   delegate_to: lb.demolab.local
   when: patches is changed
 
+- name: run insights
+  command: redhat-access-insights
+  when: patches is changed
+
 - name: Pause for 15 seconds
   pause:
     seconds: 15
