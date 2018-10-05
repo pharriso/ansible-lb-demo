@@ -11,8 +11,11 @@
 
 - name: Update all packages
   yum:
-    name: kernel
+    name: "{{ item }}"
     state: latest
+  with_items:
+    - kernel
+    - dhclient
   register: patches
 
 - name: Reboot server
