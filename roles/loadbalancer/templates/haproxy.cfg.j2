@@ -41,6 +41,6 @@ frontend  main *:80
 backend http
     balance roundrobin
     mode http
-    {% for server in groups['webservers'] %}
+    {% for server in groups['webserver'] %}
     server {{ hostvars[server].inventory_hostname }} {{ hostvars[server].inventory_hostname }}:{{ hostvars[server].port }} check
     {% endfor %}
