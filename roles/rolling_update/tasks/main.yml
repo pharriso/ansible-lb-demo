@@ -1,5 +1,8 @@
 ---
 
+- name: Check for available updates
+  shell: yum check-update
+  register: yum_updates
 
 - name: Remove server from loadbalancer pool
   haproxy:
@@ -8,6 +11,24 @@
     host: "{{ inventory_hostname }}"
     backend: http
   delegate_to: lb.demolab.local
+  when: yum_updates.rc = '100'
+
+- name: Auth to RHV so we can take a snapshot
+  ovirt_auth:
+    url: "{{ auth_url }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    insecure: true
+  delegate_to: "{{ rhv_man }}"
+  when: yum_updates.rc = '100'
+
+- name: Take snapshot of VM
+  ovirt_snapshots:
+    auth: "{{ ovirt_auth }}"
+    vm_name: "{{ inventory_hostname }}"
+    description: "{{ snapshot_description }}"
+    use_memory: false 
+  when: yum_updates.rc = '100'
 
 - name: Patch Server
   yum:
@@ -16,14 +37,15 @@
   with_items:
     - kernel
     - dhclient
-  register: patches
+  when: yum_updates.rc = '100'
+  register: patched
 
 - name: Reboot server
   shell: sleep 2 && reboot
   async: 1
   poll: 0
   ignore_errors: true
-  when: patches is changed
+  when: patched is changed
 
 - name: Wait for server to come back
   wait_for: 
@@ -32,7 +54,7 @@
     timeout: 300 
     port: 22
   delegate_to: localhost
-  when: patches is changed
+  when: patched is changed
 
 - name: Add server back into loadbalancer pool
   haproxy:
@@ -41,11 +63,11 @@
     host: "{{ inventory_hostname }}"
     backend: http
   delegate_to: lb.demolab.local
-  when: patches is changed
+  when: patched is changed
 
 - name: run insights
   command: redhat-access-insights
-  when: patches is changed
+  when: patched is changed
 
 - name: Pause for 15 seconds
   pause:

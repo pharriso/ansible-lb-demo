@@ -1,0 +1,95 @@
+---
+
+- name: Auth to RHV
+  ovirt_auth:
+    url: "{{ auth_url }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    insecure: true
+  delegate_to: "{{ rhv_man }}"
+
+- name: Create VM from template
+  ovirt_vms:
+    auth: "{{ ovirt_auth }}"
+    state: present
+    name: "{{ inventory_hostname }}"
+    template: "{{ vm_template }}"
+    cpu_cores: "{{ cpu_cores }}"
+    memory: "{{ memory }}"
+    cluster: "{{ cluster }}"
+    operating_system: rhel_7x64
+    comment: "{{ tower_user_name }}"
+    nics:
+      - name: eth0
+        profile_name: "{{ nic_profile }}"
+    timeout: 30
+  delegate_to: "{{ rhv_man }}"
+  register: vmcreated
+  retries: 1
+  until: vmcreated is success
+
+- name: Attach additional disks
+  ovirt_disks:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ inventory_hostname }}-{{ item.disk_name }}"
+    vm_name: "{{ inventory_hostname }}"
+    size: "{{ item.disk_size }}GiB"
+    format: cow
+    interface: virtio
+    storage_domain: "{{ item.disk_domain }}"
+  with_items: "{{ disks }}"
+  when: disks is defined
+  delegate_to: "{{ rhv_man }}"
+
+- name: Start vm
+  ovirt_vms:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ inventory_hostname }}"
+    state: running
+    timeout: 30
+    cloud_init:
+      host_name: "{{ inventory_hostname }}"
+      custom_script: |
+        ssh_pwauth: True
+        runcmd: 
+          - echo nameserver {{ dns_server }} > /etc/resolv.conf
+      user_name: root
+      root_password: "{{ root_password }}"
+      authorized_ssh_keys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5nSv7U/yKr6murmlRh6QNSlEa0yjY6LveV52+53LSQoUBtMZVTiM3q2HA50TLglwb4TXBeVm8509IcG2EqFETaHeCasySEcbyM2yj93djvCUf6w79ojLI38oh902SqX/zLyFqAOlz4A140q3hrVqnsNKevT2I+jbnGNWBrSYhgOrsXbiu4RCcfPSeFLsaWPG/ECcjn+Sbu7kbDA9Ep66xaXd5c3he+nAiZXhTDBUvS7W6lurHuWxAUVoou7XSsAtVcx94AN236vJLxmFSLwiWFpQtIEKhRvIJSW1hgDZzfCsQFoFcxdQzlxxcfPnDnzyuK7bT/9eaEJ9mnb+u71o9 root@tower.demolab.local
+      dns_servers: "{{ dns_server }}"
+      dns_search: "{{ dns_search }}"
+      timezone: "Europe/London"
+    cloud_init_nics:
+      - nic_name: eth0
+        nic_boot_protocol: static
+        nic_ip_address: "{{ ansible_host }}"
+        nic_netmask: 255.255.255.0
+        nic_gateway: 10.50.0.2
+        nic_on_boot: true
+  delegate_to: "{{ rhv_man }}"
+  register: vmstarted
+  retries: 1
+  until: vmstarted is success
+
+- name: Wait for server to start
+  wait_for: 
+    host: "{{ inventory_hostname }}"
+    delay: 10 
+    timeout: 1200 
+    port: 22
+  delegate_to: localhost
+ 
+- name: Disable cloud-init
+  file:
+    path: /etc/cloud/cloud-init.disabled
+    state: touch
+
+- name: Stop Cloud init messing with DNS
+  file:
+    path: /etc/NetworkManager/conf.d/99-cloud-init.conf
+    state: absent
+
+- name: Bounce Network manager after disabling cloud init
+  systemd:
+    name: NetworkManager.service
+    state: restarted
