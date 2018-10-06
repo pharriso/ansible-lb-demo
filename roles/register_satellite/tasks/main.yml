@@ -9,5 +9,5 @@
   redhat_subscription:
     state: present
     activationkey: "{{ sat_ak }}"
-    org_id: demolab
+    org_id: "{{ sat_org }}"
     force_register: yes
