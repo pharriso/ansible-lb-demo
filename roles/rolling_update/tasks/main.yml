@@ -2,6 +2,7 @@
 
 - name: Check for available updates
   shell: yum check-update
+  warn: false
   register: yum_updates
   failed_when: yum_updates.rc == 1
 
