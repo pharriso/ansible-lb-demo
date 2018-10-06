@@ -3,6 +3,7 @@
 - name: Check for available updates
   shell: yum check-update
   register: yum_updates
+  failed_when: yum_updates.rc == '1'
 
 - name: Remove server from loadbalancer pool
   haproxy:
