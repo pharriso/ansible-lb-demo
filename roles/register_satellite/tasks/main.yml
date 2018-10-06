@@ -1,0 +1,13 @@
+---
+
+- name: Install Satellite katello certificate
+  yum:
+    name: http://{{ sat_server }}/pub/katello-ca-consumer-latest.noarch.rpm
+    state: installed
+
+- name: Register to Satellite
+  redhat_subscription:
+    state: present
+    activationkey: "{{ sat_ak }}"
+    org_id: demolab
+    force_register: yes
