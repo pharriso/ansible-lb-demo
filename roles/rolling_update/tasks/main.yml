@@ -29,6 +29,7 @@
     vm_name: "{{ inventory_hostname }}"
     description: "{{ snapshot_description }}"
     use_memory: false 
+  delegate_to: "{{ rhv_man }}"
   when: yum_updates.rc == 100
 
 - name: Patch Server
