@@ -12,7 +12,7 @@
     host: "{{ inventory_hostname }}"
     backend: http
   delegate_to: lb.demolab.local
-  when: yum_updates.rc = '100'
+  when: yum_updates.rc = 100
 
 - name: Auth to RHV so we can take a snapshot
   ovirt_auth:
@@ -21,7 +21,7 @@
     password: "{{ password }}"
     insecure: true
   delegate_to: "{{ rhv_man }}"
-  when: yum_updates.rc = '100'
+  when: yum_updates.rc = 100
 
 - name: Take snapshot of VM
   ovirt_snapshots:
@@ -29,7 +29,7 @@
     vm_name: "{{ inventory_hostname }}"
     description: "{{ snapshot_description }}"
     use_memory: false 
-  when: yum_updates.rc = '100'
+  when: yum_updates.rc = 100
 
 - name: Patch Server
   yum:
@@ -38,7 +38,7 @@
   with_items:
     - kernel
     - dhclient
-  when: yum_updates.rc = '100'
+  when: yum_updates.rc = 100
   register: patched
 
 - name: Reboot server
