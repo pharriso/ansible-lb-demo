@@ -1,0 +1,58 @@
+---
+
+- name: Update dnsmasq /etc/hosts
+  lineinfile: 
+    dest: /etc/hosts 
+    line: "{{ ansible_host }} {{ inventory_hostname }}"
+  delegate_to: "{{ hypervisor }}"
+
+- name: Copy OS template disk in place
+  command: cp -p /var/lib/libvirt/images/{{ template_name }} /var/lib/libvirt/images/{{ inventory_hostname }}.qcow2 
+  args:
+    creates: /var/lib/libvirt/images/{{ inventory_hostname }}.qcow2
+  register: create_vm
+  delegate_to: "{{ hypervisor }}"
+
+- name: Resize root disk
+  shell: qemu-img resize /var/lib/libvirt/images/{{ inventory_hostname }}.qcow2 +{{ root_expand_size }}G
+  when: create_vm is changed
+  delegate_to: "{{ hypervisor }}"
+
+- name: Create additional disks if needed
+  command: qemu-img create -f qcow2 -o preallocation=metadata /var/lib/libvirt/images/{{ inventory_hostname }}-{{ item.disk_name }}.qcow2 {{ item.disk_size }}G
+  args:
+    creates: /var/lib/libvirt/images/{{ inventory_hostname }}-{{ item.disk_name }}.qcow2
+  when: disks is defined
+  with_items: "{{ disks }}"
+  delegate_to: "{{ hypervisor }}"
+
+- name: Define VM
+  virt: 
+    command: define 
+    name: "{{ inventory_hostname }}" 
+    xml: "{{ lookup('template', 'virt.xml.j2') }}"
+  register: result
+  delegate_to: "{{ hypervisor }}"
+
+- name: Inject SSH Key
+  command: virt-customize -d {{ inventory_hostname }} --ssh-inject root:file:/root/.ssh/id_rsa.pub --selinux-relabel
+  when: result is changed
+  delegate_to: "{{ hypervisor }}"
+
+- name: Set static IP
+  command: virt-customize -d {{ inventory_hostname }} --run-command "echo IPADDR={{ ansible_host }} >> /etc/sysconfig/network-scripts/ifcfg-eth0" 
+  when: result is changed
+  delegate_to: "{{ hypervisor }}"
+ 
+- name: Start VM
+  virt: 
+    state: running 
+    name: "{{ inventory_hostname }}"
+
+- name: Wait for server to come back
+  wait_for: 
+    host: "{{ inventory_hostname }}" 
+    delay: 10 
+    timeout: 300 
+    port: 22
+  delegate_to: "{{ hypervisor }}"
