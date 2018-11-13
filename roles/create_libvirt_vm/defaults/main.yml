@@ -2,3 +2,4 @@ cpu_cores: 1
 memory: 1
 root_expand_size: 20
 hypervisor: 192.168.122.1
+template_name: rhel7_template.qcow2
