@@ -4,10 +4,11 @@
   yum:
     name: http://{{ sat_server }}/pub/katello-ca-consumer-latest.noarch.rpm
     state: installed
+  when: sat_server is defined
 
-- name: Register to Satellite
+- name: Register to Satellite or CDN
   redhat_subscription:
     state: present
-    activationkey: "{{ sat_ak }}"
-    org_id: "{{ sat_org }}"
+    activationkey: "{{ rhsm_key }}"
+    org_id: "{{ rhsm_org }}"
     force_register: yes

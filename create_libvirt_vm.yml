@@ -3,4 +3,4 @@
 - hosts: all
   gather_facts: false
   roles:
-    - create_rhv_vm
+    - create_libvirt_vm

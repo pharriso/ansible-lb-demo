@@ -1,2 +1,2 @@
-vcpu: 1 
+cpu_cores: 1 
 memory: 1
