@@ -57,3 +57,18 @@
     timeout: 300 
     port: 22
   delegate_to: "{{ hypervisor }}"
+
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Expand root partition
+  shell: growpart /dev/vda 1
+  register: grow
+  ignore_errors: true
+
+- name: Grow root filesystem
+  filesystem:
+    fstype: xfs
+    dev: /dev/vda1
+    resizefs: yes
