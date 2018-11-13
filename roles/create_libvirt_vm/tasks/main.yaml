@@ -48,6 +48,7 @@
   virt: 
     state: running 
     name: "{{ inventory_hostname }}"
+  delegate_to: "{{ hypervisor }}"
 
 - name: Wait for server to come back
   wait_for: 
