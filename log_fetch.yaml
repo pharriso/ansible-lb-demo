@@ -10,7 +10,7 @@
   - name: Grab log file
     fetch:
       src: "{{ log_file }}"
-      dest: /tmp/{{ {{ source_server }}-{{ log_file | basename }}
+      dest: /tmp/{{ source_server }}-{{ log_file | basename }}
 
   - name: Copy log file to log server
     copy:
