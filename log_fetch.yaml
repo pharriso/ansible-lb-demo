@@ -1,14 +1,23 @@
 ---
-- hosts: "{{ log_server }}"
+- hosts: "{{ source_server }}"
   tasks:
-  - name: Make log directory
+  - name: Make log directory on log server
     file:
       state: directory
       path: /var/log/remote_logs
+    delegate_to: "{{ log_server }}"
 
   - name: Grab log file
+    fetch:
+      src: "{{ log_file }}"
+      dest: /tmp/{{ {{ source_server }}-{{ log_file | basename }}
+
+  - name: Copy log file to log server
     copy:
-     src: "{{ log_file }}"
+     src: /tmp/{{ source_server }}-{{ log_file | basename }}
      dest: /var/log/remote_logs/{{ source_server }}-{{ log_file | basename }}
-     remote_src: yes
-    delegate_to: "{{ source_server }}"
+
+  - name: Clean up log file locally
+    file:
+      path: /tmp/{{ source_server }}-{{ log_file | basename }}
+      state: absent
