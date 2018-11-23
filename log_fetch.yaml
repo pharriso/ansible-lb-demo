@@ -11,6 +11,7 @@
     fetch:
       src: "{{ log_file }}"
       dest: /tmp/{{ source_server }}-{{ log_file | basename }}
+      flat: yes
 
   - name: Copy log file to log server
     copy:
