@@ -11,4 +11,5 @@
     copy:
      src: "{{ log_file }}"
      dest: /var/log/remote_logs/{{ source_server }}-{{ log_file | basename }}
+     remote_src: yes
     delegate_to: "{{ log_server }}"
