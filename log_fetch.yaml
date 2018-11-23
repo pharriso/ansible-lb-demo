@@ -18,6 +18,7 @@
     copy:
      src: /tmp/{{ source_server }}-{{ log_file | basename }}
      dest: /var/log/remote_logs/{{ source_server }}-{{ log_file | basename }}
+    delegate_to: "{{ log_server }}"
 
   - name: Clean up log file locally
     file:
