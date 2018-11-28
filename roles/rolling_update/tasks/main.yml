@@ -1,4 +1,4 @@
---
+---
 
 - name: Check for available updates
   shell: yum check-update
