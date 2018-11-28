@@ -36,6 +36,7 @@
 
 - name: Take snapshot of libvirt VM
   shell: virsh snapshot-create-as "{{ inventory_hostname }}" --name "{{ snapshot_description }}" 
+  delegate_to: "{{ rhv_man }}"
   when: yum_updates.rc == 100 and ansible_facts.virtualization_type == 'kvm'
 
 - name: Patch Server
