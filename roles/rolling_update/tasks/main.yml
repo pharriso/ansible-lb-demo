@@ -13,7 +13,7 @@
     socket: /var/lib/haproxy/stats
     host: "{{ inventory_hostname }}"
     backend: http
-  delegate_to: lb.demolab.local
+  delegate_to: "{{ groups.loadbalancers | first }}"
   when: yum_updates.rc == 100
 
 - name: Auth to RHV so we can take a snapshot
@@ -23,9 +23,9 @@
     password: "{{ password }}"
     insecure: true
   delegate_to: "{{ rhv_man }}"
-  when: yum_updates.rc == 100
+  when: yum_updates.rc == 100 && ansible_facts.ansible_virtualization_type != 'kvm'
 
-- name: Take snapshot of VM
+- name: Take snapshot of RHV VM
   ovirt_snapshots:
     auth: "{{ ovirt_auth }}"
     vm_name: "{{ inventory_hostname }}"
@@ -33,6 +33,10 @@
     use_memory: false 
   delegate_to: "{{ rhv_man }}"
   when: yum_updates.rc == 100
+
+- name: Take snapshot of libvirt VM
+  shell: virsh snapshot-create-as "{{ inventory_hostname }}" --name "{{ snapshot_description }}" 
+  when: yum_updates.rc == 100 && ansible_facts.ansible_virtualization_type == 'kvm'
 
 - name: Patch Server
   yum:
@@ -66,7 +70,7 @@
     socket: /var/lib/haproxy/stats
     host: "{{ inventory_hostname }}"
     backend: http
-  delegate_to: lb.demolab.local
+  delegate_to: "{{ groups.loadbalancers | first }}"
   when: patched is changed
 
 - name: run insights
