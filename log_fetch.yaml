@@ -1,5 +1,5 @@
 ---
-- hosts: "{{ source_server }}"
+- hosts: all
   tasks:
   - name: Make log directory on log server
     file:
@@ -10,17 +10,17 @@
   - name: Grab log file
     fetch:
       src: "{{ log_file }}"
-      dest: /tmp/{{ source_server }}-{{ log_file | basename }}
+      dest: /tmp/{{ inventory_hostname }}-{{ log_file | basename }}
       flat: yes
       validate_checksum: no
 
   - name: Copy log file to log server
     copy:
-     src: /tmp/{{ source_server }}-{{ log_file | basename }}
-     dest: /var/log/remote_logs/{{ source_server }}-{{ log_file | basename }}
+     src: /tmp/{{ inventory_hostname }}-{{ log_file | basename }}
+     dest: /var/log/remote_logs/{{ inventory_hostname }}-{{ log_file | basename }}
     delegate_to: "{{ log_server }}"
 
   - name: Clean up log file locally
     file:
-      path: /tmp/{{ source_server }}-{{ log_file | basename }}
+      path: /tmp/{{ inventory_hostname }}-{{ log_file | basename }}
       state: absent
