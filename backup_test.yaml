@@ -18,3 +18,5 @@
      file: 
       path: /tmp/apefne/backups/
       state: directory
+      owner: root
+      group: root
