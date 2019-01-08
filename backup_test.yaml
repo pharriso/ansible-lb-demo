@@ -16,5 +16,5 @@
 
    - name: Create Directory {{hostvars.localhost.DTG}} 
      file: 
-      path: ~/apefne/backups/{{hostvars.localhost.DTG}}
+      path: /tmp/apefne/backups/{{hostvars.localhost.DTG}}
       state: directory
