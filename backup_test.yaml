@@ -14,7 +14,7 @@
      set_fact:
        DTG: "{{ ansible_date_time.date }}"
 
-   - name: Create Directory {{hostvars.localhost.DTG}} 
+   - name: Create Directory 
      file: 
-      path: /tmp/apefne/backups/{{hostvars.localhost.DTG}}
+      path: /tmp/apefne/backups/
       state: directory
