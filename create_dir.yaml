@@ -1,0 +1,9 @@
+---
+
+- hosts: localhost
+  connection: local
+  tasks:
+  - name: Create dir
+    file:
+      path: /tmp/testing
+      state: directory
