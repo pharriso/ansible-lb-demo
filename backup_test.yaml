@@ -16,7 +16,8 @@
 
    - name: Create Directory 
      file: 
-      path: /tmp/apefne/backups/
-      state: directory
-      owner: root
-      group: root
+       path: /tmp/apefne/backups/
+       state: directory
+       owner: root
+       group: root
+     delegate_to: localhost
