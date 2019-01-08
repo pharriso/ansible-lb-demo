@@ -17,7 +17,5 @@
 
    - name: Create Directory 
      file: 
-       path: /apefne/backups/
+       path: /tmp/apefne
        state: directory
-       owner: root
-       group: root
