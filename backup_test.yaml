@@ -2,7 +2,7 @@
 # Playbook to Backup all config and produce show outputs
 
 - hosts: localhost
-  gather_facts: false
+  gather_facts: true
   connection: local
   
   tasks:
