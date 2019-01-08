@@ -3,6 +3,7 @@
 
 - hosts: localhost
   gather_facts: false
+  connection: local
   
   tasks:
    - name: Get ansible date/time facts
