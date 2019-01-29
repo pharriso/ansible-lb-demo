@@ -12,3 +12,9 @@
     activationkey: "{{ rhsm_key }}"
     org_id: "{{ rhsm_org }}"
     force_register: yes
+
+- name: Install katello-host-tools
+  yum:
+    name: katello-host-tools
+    state: installed
+  when: sat_server is defined
