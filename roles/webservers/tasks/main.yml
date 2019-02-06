@@ -11,6 +11,11 @@
     state: started
     enabled: yes
 
+- name: Copy image across
+  copy:
+    src: techtalk.jpeg
+    dest: /var/www/html
+ 
 - name: Configure Web Content
   template: 
     dest: /var/www/html/index.html 
