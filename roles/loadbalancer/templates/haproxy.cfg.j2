@@ -44,3 +44,8 @@ backend http
     {% for server in groups['webservers'] %}
     server {{ hostvars[server].inventory_hostname }} {{ hostvars[server].inventory_hostname }}:80 check
     {% endfor %}
+    {% if az_vm_name is defined %} 
+    {% for server in groups['uksouth'] %}
+    server {{ hostvars[server].ansible_host }} {{ hostvars[server].ansible_host }}:80 check
+    {% endfor %}
+    {% endif %}
