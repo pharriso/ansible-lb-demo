@@ -11,6 +11,20 @@
     state: started
     enabled: yes
 
+- name: Check if firewalld is running
+  shell: systemctl is-active firewalld
+  register: firewall_status
+  ignore_errors: true
+
+- name: Open firewall ports for httpd
+  firewalld:
+    port: 80/tcp
+    permanent: true
+    state: enabled
+    immediate: true
+  when: firewall_status.stdout == 'active'
+
+
 - name: Copy image across
   copy:
     src: techtalk.jpeg
