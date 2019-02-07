@@ -16,28 +16,28 @@
   delegate_to: "{{ groups.loadbalancers | first }}"
   when: yum_updates.rc == 100
 
-- name: Auth to RHV so we can take a snapshot
-  ovirt_auth:
-    url: "{{ auth_url }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    insecure: true
-  delegate_to: localhost
-  when: yum_updates.rc == 100 and ansible_virtualization_type == 'RHEV'
+  #- name: Auth to RHV so we can take a snapshot
+  #ovirt_auth:
+  #  url: "{{ auth_url }}"
+  #  username: "{{ username }}"
+  #  password: "{{ password }}"
+  #  insecure: true
+  #delegate_to: localhost
+  #when: yum_updates.rc == 100 and ansible_virtualization_type == 'RHEV'
 
-- name: Take snapshot of RHV VM
-  ovirt_snapshots:
-    auth: "{{ ovirt_auth }}"
-    vm_name: "{{ inventory_hostname }}"
-    description: "{{ snapshot_description }}"
-    use_memory: false 
-  delegate_to: localhost
-  when: yum_updates.rc == 100 and ansible_virtualization_type == 'RHEV'
+  #- name: Take snapshot of RHV VM
+  #ovirt_snapshots:
+  #  auth: "{{ ovirt_auth }}"
+  #  vm_name: "{{ inventory_hostname }}"
+  #  description: "{{ snapshot_description }}"
+  #  use_memory: false 
+  #delegate_to: localhost
+  #when: yum_updates.rc == 100 and ansible_virtualization_type == 'RHEV'
 
-- name: Take snapshot of libvirt VM
-  shell: virsh snapshot-create-as "{{ inventory_hostname }}" --name "{{ snapshot_description }}" 
-  delegate_to: "{{ rhv_man }}"
-  when: yum_updates.rc == 100 and ansible_virtualization_type == 'kvm'
+  #- name: Take snapshot of libvirt VM
+  #shell: virsh snapshot-create-as "{{ inventory_hostname }}" --name "{{ snapshot_description }}" 
+  #delegate_to: "{{ rhv_man }}"
+  #when: yum_updates.rc == 100 and ansible_virtualization_type == 'kvm'
 
 - name: Patch Server
   yum:
@@ -62,7 +62,7 @@
     delay: 10 
     timeout: 300 
     port: 22
-  delegate_to: localhost
+  delegate_to: "{{ groups.loadbalancers | first }}"
   when: patched is changed
 
 - name: Add server back into loadbalancer pool
