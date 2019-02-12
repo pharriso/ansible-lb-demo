@@ -69,7 +69,7 @@
   haproxy:
     state: enabled
     socket: /var/lib/haproxy/stats
-    host: "{{ inventory_hostname }}"
+    host: "{{ ansible_host }}"
     backend: http
   delegate_to: "{{ groups.loadbalancers | first }}"
   when: patched is changed
