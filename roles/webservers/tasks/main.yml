@@ -36,12 +36,3 @@
     src: index.html.j2
   notify:
     - restart httpd
-
-- name: Downgrade sudo to test Insights
-  yum:
-    name: sudo-1.8.6p7-21.el7_3.x86_64
-    state: present
-    allow_downgrade: true
-
-- name: Run insights
-  command: redhat-access-insights
