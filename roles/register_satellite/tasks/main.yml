@@ -11,7 +11,7 @@
     state: present
     activationkey: "{{ rhsm_key }}"
     org_id: "{{ rhsm_org }}"
-    force_register: yes
+    force_register: no
 
 - name: Install katello-host-tools
   yum:
