@@ -49,21 +49,21 @@
   when: yum_updates.rc == 100
   register: patched
 
-- name: Reboot server
-  shell: sleep 2 && reboot
-  async: 1
-  poll: 0
-  ignore_errors: true
-  when: patched is changed
+  #- name: Reboot server
+  #shell: sleep 2 && reboot
+  #async: 1
+  #poll: 0
+  #ignore_errors: true
+  #when: patched is changed
 
-- name: Wait for server to come back
-  wait_for: 
-    host: "{{ ansible_host }}"
-    delay: 10 
-    timeout: 300 
-    port: 22
-  delegate_to: "{{ groups.loadbalancers | first }}"
-  when: patched is changed
+  #- name: Wait for server to come back
+  #wait_for: 
+  #  host: "{{ ansible_host }}"
+  #  delay: 10 
+  #  timeout: 300 
+  #  port: 22
+  #delegate_to: "{{ groups.loadbalancers | first }}"
+  #when: patched is changed
 
 - name: Add server back into loadbalancer pool
   haproxy:
