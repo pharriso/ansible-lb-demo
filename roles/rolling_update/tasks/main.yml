@@ -76,7 +76,7 @@
 
 - name: run insights
   command: redhat-access-insights
-  when: patched is changed
+  when: patched is changed and ansible_virtualization_type == 'RHEV'
 
 - name: Pause for 15 seconds
   pause:
