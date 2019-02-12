@@ -11,7 +11,7 @@
   haproxy:
     state: disabled
     socket: /var/lib/haproxy/stats
-    host: "{{ inventory_hostname }}"
+    host: "{{ ansible_host }}"
     backend: http
   delegate_to: "{{ groups.loadbalancers | first }}"
   when: yum_updates.rc == 100
@@ -58,7 +58,7 @@
 
 - name: Wait for server to come back
   wait_for: 
-    host: "{{ inventory_hostname }}"
+    host: "{{ ansible_host }}"
     delay: 10 
     timeout: 300 
     port: 22
