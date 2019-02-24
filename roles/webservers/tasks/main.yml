@@ -27,7 +27,7 @@
 
 - name: Copy image across
   copy:
-    src: techtalk.jpeg
+    src: "{{ web_image }}"
     dest: /var/www/html
  
 - name: Configure Web Content
