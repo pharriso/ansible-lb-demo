@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <head>
+<head>
         <title>{{ ansible_hostname }}</title>
+<style>
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+</head>
+<body>
 
-        <style type="text/css">
-        <!--
-        html, body, #tbl_wrap { height: 100%; width: 100%; padding: 0; margin: 0; }
-        #td_wrap { vertical-align: middle; text-align: center; }
-        -->
-        </style>
-    </head>
+	<img src={{ web_image }} style="width:40%">
 
-    <body>
-        <table id="tbl_wrap"><tbody><tr><td id="td_wrap">
-                                        <p><center><img src="{{ web_image }}"/></center></p>
-        </td></tr></tbody></table>
-    </body>
+</body>
 </html>
+
