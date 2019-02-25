@@ -28,7 +28,7 @@
 - name: Copy image across
   copy:
     src: "{{ web_image }}"
-    dest: /var/www/html
+    dest: /var/www/html/redhat.jpeg
  
 - name: Configure Web Content
   template: 
