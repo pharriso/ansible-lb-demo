@@ -1,0 +1,22 @@
+---
+
+- name: Let's do some stuff on a Windows server !!
+  hosts: all
+  tasks:
+  - name: Create local ansible-user
+    win_user:
+      name: ansible-user
+      state: present
+      groups:
+        - Users
+
+  - name: Install firefox
+    win_chocolatey:
+      name: firefox
+      state: present
+
+  - name: Send a message
+    win_msg:
+      display_seconds: 60
+      msg: "Ansible loves Windows !"
+
