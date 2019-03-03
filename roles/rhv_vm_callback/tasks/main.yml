@@ -46,13 +46,6 @@
       dns_servers: "{{ dns_server }}"
       dns_search: "{{ dns_search }}"
       timezone: "Europe/London"
-    cloud_init_nics:
-      - nic_name: eth0
-        nic_boot_protocol: static
-        nic_ip_address: "{{ ansible_host }}"
-        nic_netmask: 255.255.255.0
-        nic_gateway: 10.50.0.2
-        nic_on_boot: true
     nics:
       - name: eth0
         profile_name: "{{ nic_profile }}"
