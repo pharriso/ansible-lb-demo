@@ -40,7 +40,7 @@
           - echo nameserver {{ dns_server }} > /etc/resolv.conf
           - sleep 60
           - curl -k --data "host_config_key=5a08f956-d74f-4711-9466-55c995e3e357" https://ansible-tower.demolab.local:443/api/v2/job_templates/14/callback/
-      user_name: root
+      user_name: pharriso
       root_password: "{{ root_password }}"
       authorized_ssh_keys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5nSv7U/yKr6murmlRh6QNSlEa0yjY6LveV52+53LSQoUBtMZVTiM3q2HA50TLglwb4TXBeVm8509IcG2EqFETaHeCasySEcbyM2yj93djvCUf6w79ojLI38oh902SqX/zLyFqAOlz4A140q3hrVqnsNKevT2I+jbnGNWBrSYhgOrsXbiu4RCcfPSeFLsaWPG/ECcjn+Sbu7kbDA9Ep66xaXd5c3he+nAiZXhTDBUvS7W6lurHuWxAUVoou7XSsAtVcx94AN236vJLxmFSLwiWFpQtIEKhRvIJSW1hgDZzfCsQFoFcxdQzlxxcfPnDnzyuK7bT/9eaEJ9mnb+u71o9 root@tower.demolab.local
       dns_servers: "{{ dns_server }}"
