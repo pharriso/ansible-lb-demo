@@ -1,0 +1,63 @@
+---
+
+- name: Auth to RHV
+  ovirt_auth:
+    url: "{{ auth_url }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    insecure: true
+  delegate_to: "{{ rhv_man }}"
+
+- name: Check RHV to see if VM already exists
+  ovirt_vms_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: name={{ vm_name }}
+  delegate_to: "{{ rhv_man }}"
+
+- name: Fail if VM exists
+  fail:
+    msg: "VM {{ item.name }} already exists"
+  when: item.name is defined
+  with_items: "{{ ovirt_vms }}"
+  delegate_to: "{{ rhv_man }}"
+
+- name: Create VM from template
+  ovirt_vms:
+    auth: "{{ ovirt_auth }}"
+    state: running
+    name: "{{ vm_name }}"
+    template: "{{ vm_template }}"
+    cpu_cores: "{{ cpu_cores }}"
+    memory: "{{ memory }}"
+    cluster: "{{ cluster }}"
+    operating_system: rhel_7x64
+    comment: "{{ tower_user_name }}"
+    cloud_init:
+      host_name: "{{ inventory_hostname }}"
+      custom_script: |
+        ssh_pwauth: True
+        runcmd:
+          - echo nameserver {{ dns_server }} > /etc/resolv.conf
+          - sleep 60
+          - curl -k --data "host_config_key=5a08f956-d74f-4711-9466-55c995e3e357" https://ansible-tower.demolab.local:443/api/v2/job_templates/14/callback/
+      user_name: root
+      root_password: "{{ root_password }}"
+      authorized_ssh_keys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5nSv7U/yKr6murmlRh6QNSlEa0yjY6LveV52+53LSQoUBtMZVTiM3q2HA50TLglwb4TXBeVm8509IcG2EqFETaHeCasySEcbyM2yj93djvCUf6w79ojLI38oh902SqX/zLyFqAOlz4A140q3hrVqnsNKevT2I+jbnGNWBrSYhgOrsXbiu4RCcfPSeFLsaWPG/ECcjn+Sbu7kbDA9Ep66xaXd5c3he+nAiZXhTDBUvS7W6lurHuWxAUVoou7XSsAtVcx94AN236vJLxmFSLwiWFpQtIEKhRvIJSW1hgDZzfCsQFoFcxdQzlxxcfPnDnzyuK7bT/9eaEJ9mnb+u71o9 root@tower.demolab.local
+      dns_servers: "{{ dns_server }}"
+      dns_search: "{{ dns_search }}"
+      timezone: "Europe/London"
+    cloud_init_nics:
+      - nic_name: eth0
+        nic_boot_protocol: static
+        nic_ip_address: "{{ ansible_host }}"
+        nic_netmask: 255.255.255.0
+        nic_gateway: 10.50.0.2
+        nic_on_boot: true
+    nics:
+      - name: eth0
+        profile_name: "{{ nic_profile }}"
+    timeout: 30
+  delegate_to: "{{ rhv_man }}"
+  register: vmcreated
+  retries: 1
+  until: vmcreated is success
