@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  gather_facts: true
+  tasks:
+  - name: set param
+    foreman:
+      username: "{{ sat_user }}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      entity: host
+      params:
+        hostlocation: "{{ foreman.subscription_facet_attributes.registered_through }}"
